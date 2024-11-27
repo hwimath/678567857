@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>초등어휘 단어 게임</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #FFFAF0;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #FF69B4;
+        }
+        .hidden {
+            display: none;
+        }
+        .section {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #FFF0F5;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .button {
+            background-color: #FF69B4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 15px 5px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .button:hover {
+            background-color: #FF1493;
+        }
+        .quiz-option {
+            display: block;
+            text-align: left;
+            margin: 10px 0;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+        #score {
+            font-size: 24px;
+            color: #32CD32;
+        }
+    </style>
+</head>
+<body>
+
+<h1>✨ 초등어휘 단어 게임 ✨</h1>
+
+<div id="studySection" class="section">
+    <div id="studyContent">
+        <!-- Study content will be injected here -->
+    </div>
+    <button class="button" id="nextStudyBtn">다음</button>
+</div>
+
+<div id="quizSection" class="section hidden">
+    <h2>단어 퀴즈</h2>
+    <div id="quizContent">
+        <!-- Quiz content will be injected here -->
+    </div>
+    <button class="button" id="nextQuizBtn">다음</button>
+    <button class="button hidden" id="submitQuizBtn">제출</button>
+</div>
+
+<div id="scoreSection" class="section hidden">
+    <h2>🎉 점수 🎉</h2>
+    <p id="score">0 / 10</p>
+    <button class="button" onclick="location.reload()">다시 하기</button>
+</div>
+
+<script>
+// 데이터 정의
+const words = [
+    { word: "가슴속", definition: "마음 깊은 곳." },
+    { word: "가요", definition: "대중적인 노래." },
+    { word: "가위", definition: "물건을 자르는 도구." },
+    { word: "가이드", definition: "여행 안내자." },
+    { word: "가정", definition: "한 가족이 함께 사는 집." },
+    { word: "가져가다", definition: "물건을 가지고 가다." },
+    { word: "가져다주다", definition: "어떤 곳에 가져다 주다." },
+    { word: "가죽", definition: "동물의 껍질로 만든 재료." },
+    { word: "가지", definition: "나무에서 뻗어 나온 부분." },
+    { word: "가지", definition: "종류나 수를 세는 단위." }
+];
+
+const sentences = {
+    "가슴속": [
+        "그는 가슴속에 비밀을 간직하고 있다.",
+        "가슴속 깊이 감동했다.",
+        "그녀의 말이 내 가슴속을 울렸다."
+    ],
+    "가요": [
+        "나는 옛날 가요를 좋아해요.",
+        "그 가수의 신나는 가요를 들었다.",
+        "우리는 함께 가요를 불렀다."
+    ],
+    "가위": [
+        "종이를 가위로 잘랐다.",
+        "새로운 가위를 샀다.",
+        "가위가 잘 안 들어서 불편해요."
+    ],
+    "가이드": [
+        "가이드의 설명을 들었다.",
+        "여행 가이드가 우리를 안내했다.",
+        "그녀는 유명한 관광 가이드이다."
+    ],
+    "가정": [
+        "가정은 소중한 공간이다.",
+        "행복한 가정을 이루고 싶다.",
+        "그는 가정에서 큰 사랑을 받았다."
+    ],
+    "가져가다": [
+        "책을 집으로 가져갔다.",
+        "우산을 가져가세요.",
+        "그는 내 장난감을 가져갔다."
+    ],
+    "가져다주다": [
+        "엄마가 도시락을 학교에 가져다주셨다.",
+        "친구에게 선물을 가져다주었다.",
+        "택배가 물건을 집에 가져다준다."
+    ],
+    "가죽": [
+        "가죽으로 만든 지갑을 샀다.",
+        "그의 신발은 가죽 재질이다.",
+        "가죽 소파가 편안해 보인다."
+    ],
+    "가지": [
+        "나무의 가지를 잘랐다.",
+        "이 나무는 가지가 많다.",
+        "봄에는 가지에 꽃이 핀다."
+    ],
+    "가지": [
+        "사과 한 가지를 먹었다.",
+        "여러 가지 색깔의 연필이 있다.",
+        "그 가게에는 다양한 물건이 여러 가지 있다."
+    ]
+};
+
+const quizQuestions = [
+    {
+        question: "1. 그는 ____에 비밀을 간직하고 있다.",
+        options: ["가죽", "가슴속"],
+        correctAnswer: "가슴속"
+    },
+    {
+        question: "2. 나는 옛날 ____를 좋아해요.",
+        options: ["가위", "가요"],
+        correctAnswer: "가요"
+    },
+    {
+        question: "3. 종이를 ____로 잘랐다.",
+        options: ["가위", "가지"],
+        correctAnswer: "가위"
+    },
+    {
+        question: "4. 여행 ____가 우리를 안내했다.",
+        options: ["가이드", "가정"],
+        correctAnswer: "가이드"
+    },
+    {
+        question: "5. 행복한 ____을 이루고 싶다.",
+        options: ["가죽", "가정"],
+        correctAnswer: "가정"
+    },
+    {
+        question: "6. 우산을 ____세요.",
+        options: ["가져가", "가지"],
+        correctAnswer: "가져가"
+    },
+    {
+        question: "7. 친구에게 선물을 ____.",
+        options: ["가져가다", "가져다주었다"],
+        correctAnswer: "가져다주었다"
+    },
+    {
+        question: "8. ____으로 만든 지갑을 샀다.",
+        options: ["가죽", "가지"],
+        correctAnswer: "가죽"
+    },
+    {
+        question: "9. 나무의 ____를 잘랐다.",
+        options: ["가위", "가지"],
+        correctAnswer: "가지"
+    },
+    {
+        question: "10. 여러 ____ 색깔의 연필이 있다.",
+        options: ["가지", "가정"],
+        correctAnswer: "가지"
+    }
+];
+
+// 상태 변수
+let currentWordIndex = 0;
+let currentQuizIndex = 0;
+let score = 0;
+
+// 초기화 함수
+function showDefinition() {
+    if (currentWordIndex < words.length) {
+        const word = words[currentWordIndex];
+        document.getElementById('studyContent').innerHTML = `
+            <h2>단어 뜻 배우기</h2>
+            <h3>${word.word}</h3>
+            <p>${word.definition}</p>
+        `;
+    } else {
+        // 모든 단어 학습이 끝나면 퀴즈 시작
+        document.getElementById('studySection').classList.add('hidden');
+        initQuiz();
+        document.getElementById('quizSection').classList.remove('hidden');
+    }
+}
+
+function showSentences() {
+    const word = words[currentWordIndex];
+    const sentenceList = sentences[word.word];
+    let sentencesHTML = `<h2>예문 배우기</h2><h3>${word.word}</h3>`;
+    sentenceList.forEach(sentence => {
+        sentencesHTML += `<p>• ${sentence}</p>`;
+    });
+    document.getElementById('studyContent').innerHTML = sentencesHTML;
+}
+
+// 버튼 이벤트 리스너
+document.getElementById('nextStudyBtn').addEventListener('click', () => {
+    if (document.getElementById('studyContent').innerHTML.includes('단어 뜻 배우기')) {
+        showSentences();
+    } else {
+        currentWordIndex++;
+        showDefinition();
+    }
+});
+
+// 퀴즈 함수
+function initQuiz() {
+    if (currentQuizIndex < quizQuestions.length) {
+        const q = quizQuestions[currentQuizIndex];
+        document.getElementById('quizContent').innerHTML = `
+            <p>${q.question}</p>
+            ${q.options.map((option, index) => `
+                <label class="quiz-option">
+                    <input type="radio" name="quiz${currentQuizIndex}" value="${option}">
+                    ${option}
+                </label>
+            `).join('')}
+        `;
+        // Toggle buttons
+        if (currentQuizIndex === quizQuestions.length - 1) {
+            document.getElementById('nextQuizBtn').classList.add('hidden');
+            document.getElementById('submitQuizBtn').classList.remove('hidden');
+        } else {
+            document.getElementById('nextQuizBtn').classList.remove('hidden');
+        }
+    }
+}
+
+document.getElementById('nextQuizBtn').addEventListener('click', () => {
+    const q = quizQuestions[currentQuizIndex];
+    const selected = document.querySelector(`input[name="quiz${currentQuizIndex}"]:checked`);
+    if (selected) {
+        if (selected.value === q.correctAnswer) {
+            score++;
+        }
+        currentQuizIndex++;
+        initQuiz();
+    } else {
+        alert("답을 선택해주세요!");
+    }
+});
+
+document.getElementById('submitQuizBtn').addEventListener('click', () => {
+    const q = quizQuestions[currentQuizIndex];
+    const selected = document.querySelector(`input[name="quiz${currentQuizIndex}"]:checked`);
+    if (selected) {
+        if (selected.value === q.correctAnswer) {
+            score++;
+        }
+        currentQuizIndex++;
+        showScore();
+    } else {
+        alert("답을 선택해주세요!");
+    }
+});
+
+function showScore() {
+    document.getElementById('quizSection').classList.add('hidden');
+    document.getElementById('score').innerText = `${score} / ${quizQuestions.length}`;
+    document.getElementById('scoreSection').classList.remove('hidden');
+}
+
+// 초기화 시작
+showDefinition();
+</script>
+
+</body>
+</html>
